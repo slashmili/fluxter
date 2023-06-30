@@ -7,16 +7,14 @@ defmodule Fluxter.Conn do
 
   require Logger
 
-  defstruct [:sock, :header]
+  defstruct [:sock, :header, :prefix, :host, :port]
 
   def new(host, port) when is_binary(host) do
     new(String.to_charlist(host), port)
   end
 
-  def new(host, port) when is_list(host) or is_tuple(host) do
-    {:ok, addr} = :inet.getaddr(host, :inet)
-    header = Packet.header(addr, port)
-    %__MODULE__{header: header}
+  def new(host, port) do
+    %__MODULE__{host: host, port: port, header: ""}
   end
 
   def start_link(%__MODULE__{} = conn, worker) do
@@ -34,8 +32,9 @@ defmodule Fluxter.Conn do
   end
 
   def handle_cast({:write, name, tags, fields}, conn) do
-    packet = Packet.build(conn.header, name, tags, fields)
-    send(conn.sock, {self(), {:command, packet}})
+    packet = Packet.build(conn.prefix, name, tags, fields)
+    :ok = :gen_udp.send(conn.sock, conn.host, conn.port, packet)
+
     {:noreply, conn}
   end
 

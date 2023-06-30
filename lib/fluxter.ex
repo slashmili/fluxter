@@ -316,6 +316,7 @@ defmodule Fluxter do
           config.host
           |> Fluxter.Conn.new(config.port)
           |> Map.update!(:header, &[&1 | config.prefix])
+          |> Map.put(:prefix, config.prefix)
 
         @worker_names
         |> Enum.map(fn name ->

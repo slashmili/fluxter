@@ -27,17 +27,18 @@ defmodule Fluxter.Packet do
       ] ++ anc_data_part
   end
 
-  def build(header, name, tags, fields) do
+  def build(prefix, name, tags, fields) do
+    keys = encode_key(name)
     tags = encode_tags(tags)
     fields = encode_fields(fields)
-    [header, encode_key(name), tags, ?\s, fields]
+
+    "#{prefix}#{keys}#{tags} #{fields}"
   end
 
-  defp encode_tags([]), do: ""
-
   defp encode_tags(tags) do
-    for {key, val} <- Enum.sort_by(tags, &elem(&1, 0)) do
-      [?,, encode_key(key), ?=, encode_key(val)]
+    for {k, v} <- tags, reduce: "" do
+      acc ->
+        acc <> "," <> encode_key(k) <> "=" <> encode_key(v)
     end
   end
 
