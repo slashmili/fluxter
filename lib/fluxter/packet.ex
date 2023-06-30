@@ -1,32 +1,6 @@
 defmodule Fluxter.Packet do
   @moduledoc false
 
-  use Bitwise
-
-  otp_release = :erlang.system_info(:otp_release)
-  @addr_family if(otp_release >= '19', do: [1], else: [])
-
-  def header({n1, n2, n3, n4}, port) do
-    true = Code.ensure_loaded?(:gen_udp)
-
-    anc_data_part =
-      if function_exported?(:gen_udp, :send, 5) do
-        [0, 0, 0, 0]
-      else
-        []
-      end
-
-    @addr_family ++
-      [
-        band(bsr(port, 8), 0xFF),
-        band(port, 0xFF),
-        band(n1, 0xFF),
-        band(n2, 0xFF),
-        band(n3, 0xFF),
-        band(n4, 0xFF)
-      ] ++ anc_data_part
-  end
-
   def build(prefix, name, tags, fields) do
     keys = encode_key(name)
     tags = encode_tags(tags)

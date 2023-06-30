@@ -7,14 +7,14 @@ defmodule Fluxter.Conn do
 
   require Logger
 
-  defstruct [:sock, :header, :prefix, :host, :port]
+  defstruct [:sock, :prefix, :host, :port]
 
   def new(host, port) when is_binary(host) do
     new(String.to_charlist(host), port)
   end
 
   def new(host, port) do
-    %__MODULE__{host: host, port: port, header: ""}
+    %__MODULE__{host: host, port: port}
   end
 
   def start_link(%__MODULE__{} = conn, worker) do
