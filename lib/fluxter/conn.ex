@@ -33,7 +33,7 @@ defmodule Fluxter.Conn do
 
   def handle_cast({:write, name, tags, fields}, conn) do
     packet = Packet.build(conn.prefix, name, tags, fields)
-    :ok = :gen_udp.send(conn.sock, conn.host, conn.port, packet)
+    :gen_udp.send(conn.sock, conn.host, conn.port, packet)
 
     {:noreply, conn}
   end
